@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@apollo/client";
-import { Button, Form, Input, Modal, Radio, Table } from "antd";
+import { Button, Form, Input, Modal, Radio, Table, Row, Col } from "antd";
 import { GET_PATIENTS } from "../GraphQL/Query/Patient";
 import { useEffect, useState } from "react";
 import {
@@ -7,14 +7,20 @@ import {
   DELETE_PATIENT,
   EDIT_PATIENT,
 } from "../GraphQL/Mutations/PatientMutation";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  DownloadOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
+import moment from "moment";
+import * as XLSX from "xlsx";
 
 const Home = () => {
   const { loading, error, data } = useQuery(GET_PATIENTS);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [PatientAll, setPatientAll] = useState([]);
-  console.log(PatientAll);
+
   const [form] = Form.useForm();
   const [form2] = Form.useForm();
 
@@ -23,9 +29,11 @@ const Home = () => {
       let { PatientAll } = data;
       let newArr = [];
       PatientAll.map((patient, index) => {
+        let dateObject = new Date(parseInt(patient.createdAt));
+        console.log(dateObject);
         newArr.push({
-          // id: index + 1,
-          id: patient._id,
+          id: index + 1,
+          // id: patient._id,
           session_code: patient.session_code,
           machine_code: patient.machine_code,
           p_id: patient.p_id,
@@ -87,7 +95,8 @@ const Home = () => {
           system_error_log: patient.system_error_log,
           conclusion_of_session: patient.conclusion_of_session,
           data_uploaded_sess_det: patient.data_uploaded_sess_det,
-          createdAt: patient.createdAt,
+          my_date: dateObject.toLocaleDateString(),
+          my_time: dateObject.toLocaleTimeString(),
           updatedAt: patient.updatedAt,
         });
       });
@@ -97,11 +106,21 @@ const Home = () => {
   }, [loading, data]);
 
   const columns = [
-    // {
-    //   title: "No",
-    //   dataIndex: "id",
-    //   key: "id",
-    // },
+    {
+      title: "No",
+      dataIndex: "id",
+      key: "id",
+    },
+    {
+      title: "Date",
+      dataIndex: "my_date",
+      key: "my_date",
+    },
+    {
+      title: "Time",
+      dataIndex: "my_time",
+      key: "my_time",
+    },
     {
       title: "Session Code",
       dataIndex: "session_code",
@@ -387,31 +406,6 @@ const Home = () => {
       dataIndex: "data_uploaded_sess_det",
       key: "data_uploaded_sess_det",
     },
-    {
-      title: "Created At",
-      dataIndex: "createdAt",
-      key: "createdAt",
-    },
-    {
-      title: "Updated At",
-      dataIndex: "updatedAt",
-      key: "updatedAt",
-    },
-    {
-      title: "Action",
-      dataIndex: "action",
-      key: "action",
-      render: (id) => {
-        return (
-          <div style={{ cursor: "pointer" }}>
-            <DeleteOutlined
-              style={{ fontSize: "14px", color: "red", margin: "0 5px" }}
-              onClick={() => handleDelete(id)}
-            />
-          </div>
-        );
-      },
-    },
   ];
 
   const [addPatient] = useMutation(ADD_PATIENT);
@@ -419,20 +413,6 @@ const Home = () => {
   const [deletePatient] = useMutation(DELETE_PATIENT);
 
   const [editPatient] = useMutation(EDIT_PATIENT);
-
-  const handleDelete = async (id) => {
-    console.log(id);
-    // try {
-    //   await deletePatient({
-    //     variables: {
-    //       id: id,
-    //     },
-    //     refetchQueries: [{ query: GET_PATIENTS }],
-    //   });
-    // } catch (error) {
-    //   console.log(error);
-    // }
-  };
 
   const onFinish = async (values) => {
     let { name } = values;
@@ -457,68 +437,87 @@ const Home = () => {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+  const handleExcelImport = () => {
+    // Create a workbook
+    const wb = XLSX.utils.book_new();
+
+    const s2ab = (s) => {
+      const buf = new ArrayBuffer(s.length);
+      const view = new Uint8Array(buf);
+      for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xff;
+      return buf;
+    };
+    const formattedBatchList = PatientAll.map((item) => {
+      const {
+        id,
+        key,
+        my_date,
+        my_time,
+        createdAt,
+        picture,
+        updatedAt,
+        ...rest
+      } = item;
+      return {
+        ...rest,
+        Date: my_date,
+        Time: my_time,
+      };
+    });
+    const ws = XLSX.utils.json_to_sheet(formattedBatchList);
+
+    // Add the worksheet to the workbook
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+    // Generate a download link for the workbook
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
+    const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+    const url = URL.createObjectURL(blob);
+
+    // Create a link and trigger a click to download the file
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "Data_Report.xlsx";
+    a.click();
+  };
 
   return (
-    <div style={{ padding: "4rem" }}>
-      {/* <Modal title="Edit Details" open={isModalOpen} onCancel={handleCancel} footer={false}>
-        <Form
-            layout={"vertical"}
-            form={form2}
-            onFinish={handleEditSubmit}
-        >
-          <Form.Item
-              label="Name"
-              name="name"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your name!",
-                },
-              ]}
+    <div style={{ padding: "0 4rem", marginTop: "20px" }}>
+      <Row
+        style={{
+          position: "fixed",
+          width: "100%",
+          background: "#fff",
+          zIndex: 100,
+        }}
+      >
+        <Col span={12}>
+          <h1>WalkLab</h1>
+        </Col>
+        <Col span={12}>
+          <span
+            className="TopMenuTxt"
+            style={{ float: "right", marginRight: "15px" }}
           >
-            <Input />
-          </Form.Item>
-          <Form.Item
-              name="id"
-              style={{display:'none'}}
-          >
-            <Input  />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Submit
+            <Button
+              key="excelImport"
+              type="primary"
+              onClick={handleExcelImport}
+              style={{ marginRight: "70px", marginTop: "20px" }}
+            >
+              Export Report <DownloadOutlined />
             </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
-      <div>
-        <Form
-          layout={"vertical"}
-          form={form}
-          onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
-        >
-          <Form.Item
-            label="Name"
-            name="name"
-            rules={[
-              {
-                required: true,
-                message: "Please input your name!",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
-          </Form.Item>
-        </Form>
-      </div> */}
-      <div>
-        <Table dataSource={PatientAll} columns={columns} rowKey="id" />
+          </span>
+        </Col>
+      </Row>
+      <div style={{ padding: "100px 0 0 0" }}>
+        <Table
+          dataSource={PatientAll}
+          columns={columns}
+          rowKey="id"
+          pagination={true}
+          // scroll={{ y: 400 }}
+        />
       </div>
     </div>
   );
