@@ -4,6 +4,10 @@ import "./index.css";
 import Home from "./Pages/Home";
 import BulkData from "./Pages/BulkData";
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
+import RouterCom from "./router";
+import { Provider } from "react-redux";
+import { Store, persistor } from "./Redux/Store";
+import { PersistGate } from "redux-persist/integration/react";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -16,10 +20,11 @@ const client = new ApolloClient({
 });
 
 root.render(
-  <React.StrictMode>
-    <ApolloProvider client={client}>
-      <Home />
-      {/* <BulkData /> */}
-    </ApolloProvider>
-  </React.StrictMode>
+  <Provider store={Store}>
+    <PersistGate loading={null} persistor={persistor}>
+      <ApolloProvider client={client}>
+        <RouterCom />
+      </ApolloProvider>
+    </PersistGate>
+  </Provider>
 );

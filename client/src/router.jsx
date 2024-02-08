@@ -1,18 +1,34 @@
-// App.jsx
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  createBrowserRouter,
+  createRoutesFromElements,
+  Route,
+  RouterProvider,
+} from "react-router-dom";
+import Home from "./Pages/Home";
+import LoginNew from "./Pages/User/Auth/LoginNew";
 import LayoutMain from "./Pages/LayoutMain";
-import Login from "./Pages/User/Auth/LoginNew";
+import SettingComp from "./Pages/SettingComp";
+import BulkDataCom from "./Pages/BulkData";
 
-const App = () => {
+const routerAdmin = createBrowserRouter(
+  createRoutesFromElements(
+    <Route>
+      <Route path="/login" element={<LoginNew />}></Route>
+      <Route element={<LayoutMain />}>
+        <Route path="/" element={<Home />}></Route>
+        <Route path="/blukData" element={<BulkDataCom />}></Route>
+      </Route>
+    </Route>
+  )
+);
+
+const RouterCom = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/*" element={<LayoutMain />} />
-      </Routes>
-    </Router>
+    <div>
+      <RouterProvider router={routerAdmin} />
+    </div>
   );
 };
 
-export default App;
+export default RouterCom;

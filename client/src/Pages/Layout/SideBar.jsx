@@ -1,140 +1,42 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
-  UserOutlined,
   HomeFilled,
-  LogoutOutlined,
-  SettingOutlined,
   ApiOutlined,
   CloudUploadOutlined,
-  CodepenOutlined,
-  CheckSquareOutlined,
-  FileDoneOutlined,
-  CloseCircleOutlined,
-  RetweetOutlined,
-  RightCircleOutlined,
 } from "@ant-design/icons";
 import { Card, Menu, Avatar, Layout } from "antd";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { handleLogoutAc } from "../../Redux/Actions";
-import axios from "axios";
+import { Link } from "react-router-dom";
 
 const SideBar = () => {
   const { SubMenu } = Menu;
   const { Sider } = Layout;
 
-  const routerParms = useParams();
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const selector = useSelector((state) => state.persistedReducer);
-
-  const [menuList, setMenuList] = useState([]);
-  const [userAccess, setUserAccess] = useState([]);
-  const [ActiveRoleName, setActiveRoleName] = useState();
-
-  // const [menuActiveId, setMenuActiveId] = useState("4");
   const [selectedKeys, setSelectedKeys] = useState(["1"]);
 
   const [subMenuOpen, setSubMenuOpen] = useState([]);
 
-  const routeLocation = useLocation();
-
-  useEffect(() => {
-    // getUserRole();
-  }, []);
-
-  useEffect(() => {}, [routeLocation]);
-
-  const handleLogout = () => {
-    dispatch(handleLogoutAc());
-    navigate("/login");
-  };
-
-  const createMenuList = (access) => {
-    let AllMenu = [
-      {
-        id: 1,
-        key: "admin",
-        name: "Dashboard",
-        icon: <HomeFilled className="sidebarIcon" />,
-        link: "/ResultDashboard",
-        SubMenu: false,
-      },
-
-      {
-        id: 2,
-        key: "admin",
-        name: "Show POST Data",
-        icon: <ApiOutlined className="sidebarIcon" />,
-        link: "/PostApi",
-        SubMenu: false,
-      },
-      {
-        id: 3,
-        key: "admin",
-        name: "Upload Files",
-        icon: <CloudUploadOutlined className="sidebarIcon" />,
-        link: "/FileUpload",
-        SubMenu: false,
-      },
-    ];
-
-    let countID = 1;
-    let ActiveMenu = [];
-
-    access.map((x) => {
-      AllMenu.map((y) => {
-        if (x.key === y.key) {
-          y.id = countID;
-          ActiveMenu.push(y);
-          countID++;
-        }
-      });
-    });
-
-    AllMenu.map((x) => {
-      if (x.key === "settings") {
-        ActiveMenu.push(x);
-        countID++;
-      }
-      if (x.key === "logout") {
-        ActiveMenu.push(x);
-        countID++;
-      }
-    });
-
-    let adminCount = 1;
-    access.map((x) => {
-      if (x.key === "admin") {
-        ActiveMenu = [];
-        AllMenu.map((z) => {
-          if (z.key == "admin") {
-            z.id = adminCount;
-            ActiveMenu.push(z);
-            adminCount++;
-          }
-          if (z.key === "settings") {
-            ActiveMenu.push(z);
-            countID++;
-          }
-          if (z.key === "logout") {
-            ActiveMenu.push(z);
-            countID++;
-          }
-        });
-      }
-    });
-
-    if (routeLocation.pathname === "/") {
-      navigate(ActiveMenu[0].link);
-    }
-
-    setMenuList(ActiveMenu);
-  };
-
   const handleClick = (e) => {
     setSelectedKeys([e.key]);
   };
+
+  const menuList = [
+    {
+      id: 1,
+      key: "admin",
+      name: "POST Data",
+      icon: <ApiOutlined className="sidebarIcon" />,
+      link: "/",
+      SubMenu: false,
+    },
+    {
+      id: 2,
+      key: "admin",
+      name: "Bulk Data",
+      icon: <CloudUploadOutlined className="sidebarIcon" />,
+      link: "/blukData",
+      SubMenu: false,
+    },
+  ];
 
   return (
     <Sider
@@ -190,7 +92,7 @@ const SideBar = () => {
           } else {
             if (x.key === "logout") {
               return (
-                <Menu.Item key={x.id} onClick={() => handleLogout()}>
+                <Menu.Item key={x.id}>
                   <div style={{ display: "flex" }}>
                     <div>{x.icon}</div>
                     <div>
@@ -227,23 +129,16 @@ const SideBar = () => {
               <div>
                 <Avatar
                   size={35}
-                  src={
-                    <img
-                      src={`${process.env.REACT_APP_API_URL}/images/${selector.user.photo}`}
-                      alt="avatar"
-                    />
-                  }
+                  src={<img src={`./user1.png`} alt="avatar" />}
                   style={{ marginRight: "15px" }}
                 />
               </div>
               <div>
                 <div>
-                  <span className="appBarUserName">
-                    {selector.user.f_name} {selector.user.l_name}
-                  </span>
+                  <span className="appBarUserName">Harmanpreet Singh</span>
                 </div>
                 <div>
-                  <span className="appBarUserType"> {ActiveRoleName}</span>
+                  <span className="appBarUserType">Admin</span>
                 </div>
               </div>
             </div>
@@ -253,5 +148,4 @@ const SideBar = () => {
     </Sider>
   );
 };
-
 export default SideBar;

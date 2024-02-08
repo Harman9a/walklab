@@ -14,9 +14,7 @@ const HeaderCom = () => {
     >
       <Row style={{ margin: "0 30px" }}>
         <Col span={10} className="h64p">
-          <span className="appBarTxt">
-            <HomeOutlined /> Dashboard
-          </span>
+          <span className="appBarTxt">WalkLab</span>
         </Col>
 
         <Col span={7} className="h64p">
@@ -25,7 +23,7 @@ const HeaderCom = () => {
           </div> */}
         </Col>
 
-        <Col span={6} className="h64p">
+        {/* <Col span={6} className="h64p">
           <div style={{ padding: "0 10px" }}>
             <Input
               style={{ backgroundColor: "#f5f6fa" }}
@@ -39,7 +37,7 @@ const HeaderCom = () => {
           <div style={{ padding: "0 10px" }}>
             <BellOutlined style={{ fontSize: "16px", cursor: "pointer" }} />
           </div>
-        </Col>
+        </Col> */}
       </Row>
     </Header>
   );

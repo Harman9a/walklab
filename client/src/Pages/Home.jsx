@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@apollo/client";
-import { Button, Form, Input, Modal, Radio, Table, Row, Col } from "antd";
+import { Button, Col, Form, Row, Table } from "antd";
 import { GET_PATIENTS } from "../GraphQL/Query/Patient";
 import { useEffect, useState } from "react";
 import {
@@ -7,12 +7,7 @@ import {
   DELETE_PATIENT,
   EDIT_PATIENT,
 } from "../GraphQL/Mutations/PatientMutation";
-import {
-  DeleteOutlined,
-  DownloadOutlined,
-  EditOutlined,
-} from "@ant-design/icons";
-import moment from "moment";
+import { DownloadOutlined } from "@ant-design/icons";
 import * as XLSX from "xlsx";
 
 const Home = () => {
@@ -447,6 +442,7 @@ const Home = () => {
       for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xff;
       return buf;
     };
+
     const formattedBatchList = PatientAll.map((item) => {
       const {
         id,
@@ -464,6 +460,7 @@ const Home = () => {
         Time: my_time,
       };
     });
+
     const ws = XLSX.utils.json_to_sheet(formattedBatchList);
 
     // Add the worksheet to the workbook
@@ -482,43 +479,17 @@ const Home = () => {
   };
 
   return (
-    <div style={{ padding: "0 4rem", marginTop: "20px" }}>
-      <Row
-        style={{
-          position: "fixed",
-          width: "100%",
-          background: "#fff",
-          zIndex: 100,
-        }}
-      >
-        <Col span={12}>
-          <h1>WalkLab</h1>
-        </Col>
-        <Col span={12}>
-          <span
-            className="TopMenuTxt"
-            style={{ float: "right", marginRight: "15px" }}
-          >
-            <Button
-              key="excelImport"
-              type="primary"
-              onClick={handleExcelImport}
-              style={{ marginRight: "70px", marginTop: "20px" }}
-            >
-              Export Report <DownloadOutlined />
-            </Button>
-          </span>
-        </Col>
-      </Row>
-      <div style={{ padding: "100px 0 0 0" }}>
-        <Table
-          dataSource={PatientAll}
-          columns={columns}
-          rowKey="id"
-          pagination={true}
-          // scroll={{ y: 400 }}
-        />
+    <div style={{ padding: "1rem " }}>
+      <div style={{ paddingBottom: "2rem", textAlign: "center" }}>
+        <h2>POST DATA</h2>
       </div>
+      <Table
+        dataSource={PatientAll}
+        columns={columns}
+        rowKey="id"
+        pagination={true}
+        scroll={{ x: 6200 }}
+      />
     </div>
   );
 };

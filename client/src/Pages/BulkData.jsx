@@ -1,13 +1,8 @@
-import { useMutation, useQuery } from "@apollo/client";
-import { Button, Form, Input, Modal, Radio, Table } from "antd";
+import { Table } from "antd";
 import { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import * as XLSX from "xlsx";
 import axios from "axios";
-import moment from "moment";
 
-const Home = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+const BulkDataCom = () => {
   const [BulkData, setBulkData] = useState([]);
 
   useEffect(() => {
@@ -65,20 +60,18 @@ const Home = () => {
   ];
 
   return (
-    <div style={{ padding: "0 4rem " }}>
-      <div style={{ textAlign: "center", margin: "2rem 0" }}>
-        <h1>BulkData</h1>
+    <div style={{ padding: "1rem " }}>
+      <div style={{ paddingBottom: "2rem", textAlign: "center" }}>
+        <h2>BULK DATA</h2>
       </div>
-      <div>
-        <Table
-          dataSource={BulkData}
-          columns={columns}
-          rowKey="id"
-          pagination={{ pageSize: 2 }}
-        />
-      </div>
+      <Table
+        dataSource={BulkData}
+        columns={columns}
+        rowKey="id"
+        pagination={true}
+      />
     </div>
   );
 };
 
-export default Home;
+export default BulkDataCom;

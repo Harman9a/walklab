@@ -30,12 +30,12 @@ const mutation = new GraphQLObjectType({
       type: PatientTypeGraphQL,
       args: {
         id: { type: GraphQLID },
-        name:{type:GraphQLString}
+        name: { type: GraphQLString },
       },
       resolve(parent, args) {
-        return PatientData.findByIdAndUpdate(args.id,{
-          name:args.name
-        })
+        return PatientData.findByIdAndUpdate(args.id, {
+          name: args.name,
+        });
       },
     },
   },
